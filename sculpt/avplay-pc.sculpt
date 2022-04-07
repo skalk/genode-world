@@ -1,0 +1,9 @@
+system:  pc
+drivers: pc
+gpu_drv: intel
+
+# supplemental depot content added to the system image
+import: pkg/drivers_managed-pc
+import: pkg/bsd_audio_drv pkg/avplay
+
+runtime: avplay

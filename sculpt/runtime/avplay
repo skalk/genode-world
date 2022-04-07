@@ -1,0 +1,53 @@
+<config verbose="yes">
+	<parent-provides>
+		<service name="ROM"/>
+		<service name="PD"/>
+		<service name="RM"/>
+		<service name="CPU"/>
+		<service name="LOG"/>
+		<service name="Timer"/>
+		<service name="Platform"/>
+		<service name="Gui"/>
+	</parent-provides>
+	<default-route> <any-service> <parent/> </any-service> </default-route>
+	<default caps="1000"/>
+
+	<start name="audio_drv">
+		<binary name="pci_audio_drv"/>
+		<resource name="RAM" quantum="16M"/>
+		<resource name="CPU" quantum="0"/>
+		<config/>
+		<provides>
+			<service name="Audio_out"/>
+			<service name="Audio_in"/>
+		</provides>
+		<route>
+			<service name="Platform">
+				<parent label="audio"/>
+			</service>
+			<any-service> <parent/> </any-service>
+		</route>
+	</start>
+
+	<start name="avplay">
+		<resource name="RAM" quantum="64M"/>
+		<config>
+			<arg value="avplay"/>
+			<arg value="mediafile"/>
+			<sdl_audio_volume value="100"/>
+			<vfs>
+				<dir name="dev">
+					<log/> <inline name="rtc">2000-01-01 00:00</inline>
+				</dir>
+				<rom name="mediafile"/>
+			</vfs>
+			<libc rtc="/dev/rtc" stdout="/dev/log" stderr="/dev/log"/>
+		</config>
+		<route>
+			<service name="Audio_out">
+				<child name="audio_drv"/>
+			</service>
+			<any-service> <parent/> </any-service>
+		</route>
+	</start>
+</config>

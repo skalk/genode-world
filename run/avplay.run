@@ -1,38 +1,18 @@
-set build_components { app/avplay }
+# Sculpt env variables
+set ::env(SCULPT) avplay
+set ::env(LOG)    core
 
 #
 # Download media file
 #
-
 set media_url "http://vdb.dhs.nu/escape-chotro.mp4"
 if {![file exists bin/mediafile]} {
 	puts "downloading media file from $media_url"
 	catch { exec wget -O bin/mediafile $media_url }
 }
 
-set app_config {
-	<start name="avplay" caps="200">
-		<resource name="RAM" quantum="64M"/>
-		<config>
-			<arg value="avplay"/>
-			<arg value="mediafile"/>
-			<sdl_audio_volume value="100"/>
-			<vfs>
-				<dir name="dev">
-					<log/> <inline name="rtc">2000-01-01 00:00</inline>
-				</dir>
-				<rom name="mediafile"/>
-			</vfs>
-			<libc rtc="/dev/rtc" stdout="/dev/log" stderr="/dev/log"/>
-		</config>
-	</start>}
+set boot_modules { mediafile }
 
-set boot_modules {
-	avplay
-	libc.lib.so vfs.lib.so vfs.lib.so vfs.lib.so libm.lib.so zlib.lib.so sdl.lib.so
-	avfilter.lib.so avutil.lib.so avcodec.lib.so avformat.lib.so swscale.lib.so
-	avresample.lib.so avdevice.lib.so
-	mediafile
-}
+source ${genode_dir}/repos/gems/run/sculpt.run
 
-source ${genode_dir}/repos/world/run/gui_app.inc
+run_genode_until forever
